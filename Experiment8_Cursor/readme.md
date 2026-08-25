@@ -247,8 +247,56 @@ END;
 - Use a cursor FOR loop to fetch and display employee names along with their department numbers.
 - Implement exception handling to catch the relevant exceptions.
 
+Program:
+```
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_count NUMBER := 0;
+
+    -- Cursor FOR loop
+    CURSOR emp_cursor IS
+        SELECT first_name, last_name, department_id
+        FROM HR.EMPLOYEES;
+
+BEGIN
+    FOR emp IN emp_cursor LOOP
+
+        v_count := v_count + 1;
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Employee Name: ' || emp.first_name || ' ' || emp.last_name ||
+            ' | Department No: ' || emp.department_id
+        );
+
+    END LOOP;
+
+    -- Raise NO_DATA_FOUND if no employees exist
+    IF v_count = 0 THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Error: No employees found in the database.'
+        );
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Unexpected Error: ' || SQLERRM
+        );
+END;
+/
+```
+
 **Output:**  
-The program should display employee names with their department numbers or the appropriate error message if no data is found.
+<img width="392" height="302" alt="Screenshot 2026-08-25 103316" src="https://github.com/user-attachments/assets/194bb6c4-f995-4e95-a387-0c4851e95a35" />
+<img width="407" height="300" alt="Screenshot 2026-08-25 103326" src="https://github.com/user-attachments/assets/3fd80ea8-82c4-4b56-bbde-b3ed665ec6c4" />
+<img width="396" height="300" alt="Screenshot 2026-08-25 103334" src="https://github.com/user-attachments/assets/795b43ec-a2f7-468e-a8f3-358bfa1cacdd" />
+<img width="417" height="310" alt="Screenshot 2026-08-25 103342" src="https://github.com/user-attachments/assets/2ca71d83-b703-4685-9594-485a534b4698" />
+<img width="437" height="302" alt="Screenshot 2026-08-25 103350" src="https://github.com/user-attachments/assets/e4419659-dc83-4901-93fb-54a442a97520" />
+<img width="457" height="161" alt="Screenshot 2026-08-25 103358" src="https://github.com/user-attachments/assets/fdbaee8d-b00e-4e4c-b49b-c20a22e9ac26" />
 
 ---
 
