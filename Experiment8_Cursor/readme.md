@@ -314,8 +314,108 @@ END;
 - Declare a cursor using `%ROWTYPE` to fetch complete rows from the `employees` table.
 - Implement exception handling to catch the relevant exceptions and display appropriate messages.
 
+Program:
+```
+SET SERVEROUTPUT ON;
+
+DECLARE
+    -- Declare cursor
+    CURSOR emp_cursor IS
+        SELECT employee_id, first_name, last_name, job_id, salary
+        FROM HR.EMPLOYEES;
+
+    -- Declare record using %ROWTYPE
+    v_emp emp_cursor%ROWTYPE;
+
+    v_count NUMBER := 0;
+
+BEGIN
+    OPEN emp_cursor;
+
+    LOOP
+        FETCH emp_cursor INTO v_emp;
+
+        EXIT WHEN emp_cursor%NOTFOUND;
+
+        v_count := v_count + 1;
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Employee ID: ' || v_emp.employee_id
+        );
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Employee Name: ' || v_emp.first_name || ' ' || v_emp.last_name
+        );
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Designation: ' || v_emp.job_id
+        );
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Salary: ' || v_emp.salary
+        );
+
+        DBMS_OUTPUT.PUT_LINE('-----------------------------');
+    END LOOP;
+
+    CLOSE emp_cursor;
+
+    -- Check whether any records were fetched
+    IF v_count = 0 THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Error: No employees found in the database.'
+        );
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Unexpected Error: ' || SQLERRM
+        );
+
+        IF emp_cursor%ISOPEN THEN
+            CLOSE emp_cursor;
+        END IF;
+END;
+/
+```
+
 **Output:**  
-The program should display employee records or the appropriate error message if no data is found.
+
+<img width="487" height="298" alt="Screenshot 2026-08-25 103703" src="https://github.com/user-attachments/assets/1faa5163-bb61-4ab0-8643-4b3137031b98" />
+
+<img width="402" height="267" alt="Screenshot 2026-08-25 103710" src="https://github.com/user-attachments/assets/16721d34-fb1f-45e8-ac09-5b6ecca48587" />
+
+<img width="355" height="277" alt="Screenshot 2026-08-25 103720" src="https://github.com/user-attachments/assets/f835a999-fc8a-4abc-b076-9a4cc569cf53" />
+
+<img width="301" height="275" alt="Screenshot 2026-08-25 103727" src="https://github.com/user-attachments/assets/40aebb45-e83a-401c-a133-36b43581e824" />
+
+<img width="285" height="266" alt="Screenshot 2026-08-25 103741" src="https://github.com/user-attachments/assets/0663e79b-cda8-4cb8-bf47-fa5d2e29bd0f" />
+
+<img width="307" height="268" alt="Screenshot 2026-08-25 103748" src="https://github.com/user-attachments/assets/c9c19e02-cd56-4c88-ba2a-c00ccf574b5e" />
+
+<img width="271" height="263" alt="Screenshot 2026-08-25 103757" src="https://github.com/user-attachments/assets/1c21f30c-904e-4867-b58e-7bce5c62e5c4" />
+
+<img width="318" height="276" alt="Screenshot 2026-08-25 103803" src="https://github.com/user-attachments/assets/78bcbe93-b333-42f3-9c13-9c09fdae6091" />
+
+<img width="301" height="270" alt="Screenshot 2026-08-25 103811" src="https://github.com/user-attachments/assets/b7dc05d8-5ec1-4a6d-9f91-4d67867e443b" />
+
+<img width="328" height="270" alt="Screenshot 2026-08-25 103817" src="https://github.com/user-attachments/assets/0b8d8837-bf59-49e6-a812-0f056cd5fe9d" />
+
+<img width="312" height="270" alt="Screenshot 2026-08-25 104002" src="https://github.com/user-attachments/assets/795310b9-1109-4054-a05b-c9263fadd344" />
+
+<img width="300" height="272" alt="Screenshot 2026-08-25 104010" src="https://github.com/user-attachments/assets/cd6fa2fb-9540-4de7-be04-b7004bd6c6e7" />
+
+<img width="316" height="271" alt="Screenshot 2026-08-25 104020" src="https://github.com/user-attachments/assets/577e7bfb-9260-4fec-8679-900679c12dca" />
+
+<img width="300" height="275" alt="Screenshot 2026-08-25 104026" src="https://github.com/user-attachments/assets/f6c1e138-90e1-43c6-8075-3cd5a1f5f45c" />
+
+<img width="297" height="277" alt="Screenshot 2026-08-25 104031" src="https://github.com/user-attachments/assets/28cd3a8e-395a-4dd7-8f9a-cdd427e199d6" />
+
+<img width="335" height="296" alt="Screenshot 2026-08-25 104040" src="https://github.com/user-attachments/assets/3f47d96f-89a4-446b-85b4-ec336ccd105f" />
 
 ---
 
