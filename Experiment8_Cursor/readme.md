@@ -433,8 +433,57 @@ END;
 - Use a cursor with the `FOR UPDATE` clause to lock the rows of employees in a specific department and update their salary.
 - Implement exception handling to handle `NO_DATA_FOUND` or other errors that may occur.
 
+Program:
+```
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_dept_no NUMBER := 60;
+    v_count NUMBER := 0;
+
+    CURSOR emp_cursor IS
+        SELECT employee_id, first_name, last_name, salary
+        FROM HR.EMPLOYEES
+        WHERE department_id = v_dept_no;
+
+BEGIN
+    FOR emp IN emp_cursor LOOP
+
+        v_count := v_count + 1;
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Employee ID: ' || emp.employee_id ||
+            ' | Name: ' || emp.first_name || ' ' || emp.last_name ||
+            ' | Salary: ' || emp.salary
+        );
+
+    END LOOP;
+
+    IF v_count = 0 THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Employees found: ' || v_count
+    );
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Error: No employees found in department ' || v_dept_no
+        );
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Unexpected Error: ' || SQLERRM
+        );
+END;
+/
+```
+
 **Output:**  
-The program should update employee salaries and display a message, or it should display an error message if no data is found.
+<img width="432" height="285" alt="Screenshot 2026-08-25 105011" src="https://github.com/user-attachments/assets/da478c44-5682-4509-9ee6-c19518dfd4af" />
+
 
 ---
 
