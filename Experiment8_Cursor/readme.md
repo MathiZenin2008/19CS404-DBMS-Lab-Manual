@@ -154,8 +154,82 @@ END;
 - Use a parameterized cursor to accept a salary range as input and fetch employees within that range.
 - Implement exception handling to catch and display relevant error messages.
 
+Program:
+```
+SET SERVEROUTPUT ON;
+
+DECLARE
+    -- Variables for salary range
+    v_min_salary NUMBER := 5000;
+    v_max_salary NUMBER := 15000;
+
+    -- Variable to check whether records are found
+    v_count NUMBER := 0;
+
+    -- Parameterized cursor
+    CURSOR emp_cursor(p_min_salary NUMBER, p_max_salary NUMBER) IS
+        SELECT employee_id, first_name, last_name, job_id, salary
+        FROM HR.EMPLOYEES
+        WHERE salary BETWEEN p_min_salary AND p_max_salary;
+
+    -- Variables to store employee details
+    v_emp_id HR.EMPLOYEES.EMPLOYEE_ID%TYPE;
+    v_first_name HR.EMPLOYEES.FIRST_NAME%TYPE;
+    v_last_name HR.EMPLOYEES.LAST_NAME%TYPE;
+    v_job_id HR.EMPLOYEES.JOB_ID%TYPE;
+    v_salary HR.EMPLOYEES.SALARY%TYPE;
+
+BEGIN
+    OPEN emp_cursor(v_min_salary, v_max_salary);
+
+    LOOP
+        FETCH emp_cursor
+        INTO v_emp_id, v_first_name, v_last_name, v_job_id, v_salary;
+
+        EXIT WHEN emp_cursor%NOTFOUND;
+
+        v_count := v_count + 1;
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Employee ID: ' || v_emp_id ||
+            ' | Name: ' || v_first_name || ' ' || v_last_name ||
+            ' | Job: ' || v_job_id ||
+            ' | Salary: ' || v_salary
+        );
+    END LOOP;
+
+    CLOSE emp_cursor;
+
+    -- Raise NO_DATA_FOUND if no employees are found
+    IF v_count = 0 THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Error: No employees found in the salary range ' ||
+            v_min_salary || ' to ' || v_max_salary
+        );
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Unexpected Error: ' || SQLERRM
+        );
+
+        IF emp_cursor%ISOPEN THEN
+            CLOSE emp_cursor;
+        END IF;
+END;
+/
+```
+
 **Output:**  
-The program should display the employee details within the specified salary range or an error message if no data is found.
+<img width="526" height="305" alt="Screenshot 2026-08-25 103005" src="https://github.com/user-attachments/assets/109cd40d-622d-449c-9116-d9463ee3e8da" />
+<img width="501" height="305" alt="Screenshot 2026-08-25 103015" src="https://github.com/user-attachments/assets/62d12eb0-52a2-4c74-93f4-5c8a424b533c" />
+<img width="510" height="262" alt="Screenshot 2026-08-25 103024" src="https://github.com/user-attachments/assets/071c04ca-ce28-4c64-8c6c-01b2ab207e01" />
+<img width="333" height="85" alt="Screenshot 2026-08-25 103030" src="https://github.com/user-attachments/assets/ff735375-cd50-4dd9-8af4-a1e83398a9ee" />
+
 
 ---
 
