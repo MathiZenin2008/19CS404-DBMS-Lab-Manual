@@ -76,8 +76,67 @@ END;
 - Use a simple cursor to fetch and display employee names and designations.
 - Implement exception handling to catch the relevant exceptions and display appropriate messages.
 
+Program:
+```
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT first_name, job_id
+        FROM HR.EMPLOYEES;
+
+    v_emp_name HR.EMPLOYEES.FIRST_NAME%TYPE;
+    v_designation HR.EMPLOYEES.JOB_ID%TYPE;
+    v_count NUMBER := 0;
+
+BEGIN
+    OPEN emp_cursor;
+
+    LOOP
+        FETCH emp_cursor INTO v_emp_name, v_designation;
+
+        EXIT WHEN emp_cursor%NOTFOUND;
+
+        v_count := v_count + 1;
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Employee Name: ' || v_emp_name ||
+            ' | Designation: ' || v_designation
+        );
+    END LOOP;
+
+    CLOSE emp_cursor;
+
+    IF v_count = 0 THEN
+        RAISE NO_DATA_FOUND;
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: No employee records found.');
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE(
+            'Unexpected Error: ' || SQLERRM
+        );
+
+        IF emp_cursor%ISOPEN THEN
+            CLOSE emp_cursor;
+        END IF;
+END;
+/
+```
+
+
 **Output:**  
-The program should display the employee details or an error message.
+<img width="388" height="303" alt="Screenshot 2026-08-25 102307" src="https://github.com/user-attachments/assets/cf73d375-a28a-42b3-8897-a03d195ab710" />
+<img width="358" height="303" alt="Screenshot 2026-08-25 102319" src="https://github.com/user-attachments/assets/7fdef6f3-15c6-4302-ab77-9128532b274d" />
+<img width="365" height="310" alt="Screenshot 2026-08-25 102331" src="https://github.com/user-attachments/assets/6c674928-43f2-4fdf-a90f-f2c0327fd1a3" />
+<img width="360" height="312" alt="Screenshot 2026-08-25 102341" src="https://github.com/user-attachments/assets/9be6c614-65a1-4423-86d8-4e3483159cd6" />
+<img width="381" height="316" alt="Screenshot 2026-08-25 102350" src="https://github.com/user-attachments/assets/bd808b36-4858-439d-8318-46ff0855a26b" />
+<img width="340" height="150" alt="Screenshot 2026-08-25 102401" src="https://github.com/user-attachments/assets/36800305-da1e-4376-b3fa-05ef40277cc1" />
+
 
 ---
 
